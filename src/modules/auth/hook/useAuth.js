@@ -10,8 +10,10 @@ const useAuth = () => {
 
   return {
     isAuthenticated: context.isAuthenticated,
+    user: context.user,
     singin: context.singin,
     singout: context.singout,
+    signup: context.signup,
   };
 
 };

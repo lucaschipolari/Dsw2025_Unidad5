@@ -1,6 +1,8 @@
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
 import { AuthProvider } from './modules/auth/context/AuthProvider';
+import PrincipalPage from './modules/home/pages/PrincipalPage';
 import LoginPage from './modules/auth/pages/LoginPage';
+import RegisterPage from './modules/auth/pages/RegisterPage';
 import Dashboard from './modules/templates/components/Dashboard';
 import ProtectedRoute from './modules/auth/components/ProtectedRoute';
 import ListOrdersPage from './modules/orders/pages/ListOrdersPage';
@@ -16,7 +18,7 @@ function App() {
       children: [
         {
           path: '/',
-          element: <>Listado de productos</>,
+          element: <PrincipalPage />,
         },
         {
           path: '/cart',
@@ -27,6 +29,10 @@ function App() {
     {
       path: '/login',
       element: <LoginPage />,
+    },
+    {
+      path: '/signup',
+      element: <RegisterPage />,
     },
     {
       path: '/admin',

@@ -10,5 +10,5 @@ export const getProducts = async (search = null, status = null, pageNumber = 1, 
 
   const response = await instance.get(`api/products/admin?${queryString}`);
 
-  return { data: response.data, error: null };
+  return { data: response.data.data, error: null };
 };
