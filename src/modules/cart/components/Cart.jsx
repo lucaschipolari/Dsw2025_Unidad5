@@ -7,18 +7,19 @@ import Swal from 'sweetalert2';
 import { postOrders } from '../services/cartOrders';
 import ModalLogin from '../../auth/components/ModalLogin';
 import ModalRegister from '../../auth/components/ModalRegister';
+import { getErrorMessage } from '../../utils/errors/getErrorMessage';
 
 const Cart = () => {
   const { products, updateQuantity, clearCart, clearProduct } = useCartStore();
   const totalPrice = useTotalPrice();
   const { isAuthenticated, user } = useAuth();
-  // const [ showModal, setShowModal ] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
+  const [error, setError] = useState();
 
   const totalItems = products.reduce((acc, p) => acc + p.quantity, 0);
 
-  const handleLimpiarCarrito = () =>{
+  const handleLimpiarCarrito = () => {
     Swal.fire({
       title: '¿Estás seguro?',
       text: 'Se eliminarán todos los productos del carrito.',
@@ -65,18 +66,27 @@ const Cart = () => {
     }));
 
     const payload = {
-      customerId: user.id ?? user.userId ?? user.sub, // soporte a distintos formatos
+      customerId: user.customerId, // soporte a distintos formatos
       shippingAddress: user.shippingAddress ?? 'shipping',
       billingAddress: user.billingAddress ?? 'billing',
       orderItems,
     };
 
-    console.log(payload);
+    try {
+      const response = await postOrders(payload);
 
-    try { const response = await postOrders (payload);
+      if (!response.success) {
+        const mensaje = getErrorMessage(response.errorCode, response.message);
 
-      if (!response.ok) {
-        throw new Error('Error en la creación del pedido');
+        Swal.fire({
+          icon: 'error',
+          title: 'No se pudo crear el pedido',
+          text: mensaje,
+        });
+
+        setError(mensaje);
+
+        return;
       }
 
       Swal.fire({
@@ -99,7 +109,6 @@ const Cart = () => {
     <div className="mx-10 my-10">
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="flex-1 space-y-6">
-
           {products.length === 0 && (
             <div className="text-center text-gray-500 text-lg">
               Tu carrito está vacío.
@@ -148,13 +157,9 @@ const Cart = () => {
           <div>
             <h2 className="text-xl font-semibold">Detalle de pedido</h2>
 
-            <p className="mt-4 text-gray-600">
-              Cantidad total: {totalItems}
-            </p>
+            <p className="mt-4 text-gray-600">Cantidad total: {totalItems}</p>
 
-            <p className="mt-2 text-gray-600">
-              Total a pagar: ${totalPrice}
-            </p>
+            <p className="mt-2 text-gray-600">Total a pagar: ${totalPrice}</p>
           </div>
 
           <button

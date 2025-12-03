@@ -77,6 +77,9 @@ function AuthProvider({ children }) {
       id: decoded.jti,
       username: decoded.sub,
       role: decoded.role,
+      customerId: data.profile?.customerId,
+      customerName: data.profile?.customerName,
+      email: data.email,
     };
 
     setUser(newUser);

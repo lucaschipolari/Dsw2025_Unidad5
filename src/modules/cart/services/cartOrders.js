@@ -1,16 +1,32 @@
-import { instance } from '../../shared/api/axiosInstance';
+import { instance } from "../../shared/api/axiosInstance";
 
 export const postOrders = async (formData) => {
   try {
-    const response = await instance.post('/api/orders', formData);
+    const response = await instance.post("/api/orders", formData);
 
-    return { data: response.data.data, error: null };
-
+    // El backend devuelve algo como:
+    // { success: true, data: {...}, message: "...", errorCode: null }
+    return {
+      success: response.data.success,
+      data: response.data.data,
+      message: response.data.message,
+      errorCode: response.data.errorCode,
+    };
   } catch (error) {
-    if (error.response && error.response.data.data) {
-      return { data: null, error: error.response.data.data };
+    if (error.response && error.response.data) {
+      return {
+        success: false,
+        data: null,
+        message: error.response.data.message,
+        errorCode: error.response.data.errorCode,
+      };
     }
 
-    return { data: null, error: { message: 'Error de red. Servidor no responde.' } };
+    return {
+      success: false,
+      data: null,
+      message: "Error de red. Servidor no responde.",
+      errorCode: null,
+    };
   }
 };

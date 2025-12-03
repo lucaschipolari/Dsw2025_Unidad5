@@ -80,12 +80,12 @@ export const useCartStore = create(
             products: state.products.map((product) => {
               if (product.id === id) {
                 Swal.fire({
-                    title: '¿Estás seguro?',
-                    text: 'Estás a punto de eliminar el producto del carrito.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Sí, eliminar',
-                    cancelButtonText: 'Cancelar',
+                  title: '¿Estás seguro?',
+                  text: 'Estás a punto de eliminar el producto del carrito.',
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonText: 'Sí, eliminar',
+                  cancelButtonText: 'Cancelar',
                 }).then((result) => {
                   if (result.isConfirmed) {
                     set((state) => ({
