@@ -14,20 +14,44 @@ export const useCartStore = create(
 
           if (existingProductIndex >= 0) {
             const updateProducts = [...state.products];
+            const existing = updateProducts[existingProductIndex];
+
+            // nueva cantidad calculada
+            let newQuantity = existing.quantity + product.quantity;
+
+            // validación: no superar stock
+            if (newQuantity > product.stockQuantity) {
+              newQuantity = product.stockQuantity;
+              Swal.fire({
+                icon: 'info',
+                title: 'Stock máximo alcanzado',
+                text: `No puedes agregar más de ${product.stockQuantity} unidades.`,
+              });
+            }
 
             updateProducts[existingProductIndex] = {
-              ...updateProducts[existingProductIndex],
-              quantity:
-                updateProducts[existingProductIndex].quantity +
-                product.quantity,
+              ...existing,
+              quantity: newQuantity,
             };
 
             return { products: updateProducts };
           } else {
+            // validación: no superar stock
+            let finalQuantity = product.quantity;
+
+            if (finalQuantity > product.stockQuantity) {
+              finalQuantity = product.stockQuantity;
+              Swal.fire({
+                icon: 'info',
+                title: 'Stock máximo alcanzado',
+                text: `No puedes agregar más de ${product.stockQuantity} unidades.`,
+              });
+            }
+
             return {
               products: [
                 ...state.products,
-                { ...product, quantity: product.quantity },
+                { ...product, quantity: finalQuantity },
               ],
             };
           }
@@ -59,9 +83,21 @@ export const useCartStore = create(
                     }
                   });
                 } else {
+                  let newQuantity = product.quantity + increment;
+
+                  // validación stock
+                  if (newQuantity > product.stockQuantity) {
+                    newQuantity = product.stockQuantity;
+                    Swal.fire({
+                      icon: 'info',
+                      title: 'Stock máximo alcanzado',
+                      text: `No puedes tener más de ${product.stockQuantity} unidades.`,
+                    });
+                  }
+
                   return {
                     ...product,
-                    quantity: Math.max(0, product.quantity + increment),
+                    quantity: Math.max(0, newQuantity),
                   };
                 }
               }
@@ -71,9 +107,10 @@ export const useCartStore = create(
           };
         }),
 
-      clearCart: () => set(() => ({
-        products: [],
-      })),
+      clearCart: () =>
+        set(() => ({
+          products: [],
+        })),
       clearProduct: (id) =>
         set((state) => {
           return {
