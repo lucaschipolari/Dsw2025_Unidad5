@@ -1,8 +1,8 @@
-import { instance } from "../../shared/api/axiosInstance";
+import { instance } from '../../shared/api/axiosInstance';
 
 export const postOrders = async (formData) => {
   try {
-    const response = await instance.post("/api/orders", formData);
+    const response = await instance.post('/api/orders', formData);
 
     // El backend devuelve algo como:
     // { success: true, data: {...}, message: "...", errorCode: null }
@@ -25,7 +25,7 @@ export const postOrders = async (formData) => {
     return {
       success: false,
       data: null,
-      message: "Error de red. Servidor no responde.",
+      message: 'Error de red. Servidor no responde.',
       errorCode: null,
     };
   }

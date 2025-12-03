@@ -25,7 +25,6 @@ const ShopListProducts = () => {
 
       setProducts(data.productItems);
     } catch (error) {
-      console.error(error);
     } finally {
       setLoading(false);
     }

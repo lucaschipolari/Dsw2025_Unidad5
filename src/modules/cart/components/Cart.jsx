@@ -114,16 +114,13 @@ const Cart = () => {
               Tu carrito está vacío.
             </div>
           )}
-
           {products.map((item) => (
             <div
               key={item.id}
               className="bg-white border rounded-xl shadow-sm px-6 py-5 flex justify-between items-center"
             >
-              {/* Información del producto */}
               <div>
                 <h3 className="text-lg font-semibold">{item.name}</h3>
-
                 <div className="flex gap-10 mt-2 text-gray-600">
                   <span>Cantidad: {item.quantity}</span>
                   <span>Sub Total: ${item.price * item.quantity}</span>
@@ -161,7 +158,6 @@ const Cart = () => {
 
             <p className="mt-2 text-gray-600">Total a pagar: ${totalPrice}</p>
           </div>
-
           <button
             className="mt-6 w-full py-2 rounded-lg bg-purple-200"
             disabled={products.length === 0}
@@ -169,7 +165,6 @@ const Cart = () => {
           >
             Finalizar Compra
           </button>
-
           <Button
             className="mt-4 w-full py-2 bg-red-300"
             onClick={handleLimpiarCarrito}
@@ -186,7 +181,6 @@ const Cart = () => {
           setShowRegister(true);
         }}
       />
-
       <ModalRegister
         show={showRegister}
         onClose={() => setShowRegister(false)}
