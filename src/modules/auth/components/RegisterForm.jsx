@@ -40,7 +40,6 @@ function RegisterForm({ insideModal = false }) {
         return;
       }
 
-      console.log(formData);
       const { error: signinError } = await singin(
         formData.username,
         formData.password,
@@ -64,18 +63,10 @@ function RegisterForm({ insideModal = false }) {
 
   return (
     <form
-      className='
-        flex
-        flex-col
-        gap-20
-        bg-white
-        p-8
-        m-4
-        sm:w-md
-        sm:gap-4
-        sm:rounded-lg
-        sm:shadow-lg
-      '
+      className={`
+      flex flex-col
+      ${insideModal ? 'gap-4 p-0 m-0 w-full text-lg' : 'gap-20 p-8 m-4 sm:gap-4 bg-white sm:rounded-lg sm:shadow-lg'}
+  `}
       onSubmit={handleSubmit(onValid)}
     >
       <Input

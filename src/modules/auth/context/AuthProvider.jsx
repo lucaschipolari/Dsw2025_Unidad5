@@ -31,7 +31,7 @@ function AuthProvider({ children }) {
   const signup = async (formData) => {
     const { confirmPassword: _confirmPassword, ...dataToSubmit } = formData;
 
-    const { data, error } = await register(dataToSubmit);
+    const { error } = await register(dataToSubmit);
 
     if (error) return { error };
 
