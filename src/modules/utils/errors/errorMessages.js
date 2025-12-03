@@ -24,4 +24,8 @@ export const errorMessages = {
 
   // 6000 – Base de datos
   6000: 'Error en la base de datos.',
+
+  7000: 'El usuario ya existe en el sistema.',
+  7001: 'El email ya está registrado por otro usuario.',
+  7002: 'El rol especificado no existe.',
 };
