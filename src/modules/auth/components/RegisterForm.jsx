@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Input from '../../shared/components/Input';
 import Button from '../../shared/components/Button';
 import Select from '../../shared/components/Select';
 import useAuth from '../hook/useAuth';
 import { frontendErrorMessage } from '../helpers/backendError';
 
-function RegisterForm() {
+function RegisterForm({ insideModal = false }) {
   const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { signup, singin } = useAuth();
+  const location = useLocation();
+
   const {
     register,
     handleSubmit,
@@ -19,7 +22,7 @@ function RegisterForm() {
     defaultValues: {
       username: '',
       email: '',
-      role: '',
+      role: 'customer',
       password: '',
       confirmPassword: '',
     },
@@ -29,33 +32,27 @@ function RegisterForm() {
 
   const onValid = async (formData) => {
     try {
-      const { error } = await signup(formData);
+      const { error: signupError } = await signup(formData);
 
-      if (error) {
-        setErrorMessage(error.frontendErrorMessage);
+      if (signupError) {
+        setErrorMessage(signupError.frontendErrorMessage);
 
         return;
       }
 
-      try {
+      console.log(formData);
+      const { error: signinError } = await singin(
+        formData.username,
+        formData.password,
+      );
 
-        const { error } = await singin(formData.username, formData.password);
+      if (signinError) {
+        setErrorMessage(signinError.frontendErrorMessage);
 
-        if (error) {
-          setErrorMessage(error.frontendErrorMessage);
-
-          return;
-        }
-
-        navigate('/admin/home');
-
-      } catch (error) {
-        if (error?.response?.data?.code) {
-          setErrorMessage(frontendErrorMessage[error?.response?.data?.code]);
-        } else {
-          setErrorMessage('Error al intentar registrar. Llame a soporte');
-        }
+        return;
       }
+
+      navigate('/admin/home');
     } catch (error) {
       if (error?.response?.data?.code) {
         setErrorMessage(frontendErrorMessage[error?.response?.data?.code]);
@@ -66,7 +63,8 @@ function RegisterForm() {
   };
 
   return (
-    <form className='
+    <form
+      className='
         flex
         flex-col
         gap-20
@@ -78,60 +76,72 @@ function RegisterForm() {
         sm:rounded-lg
         sm:shadow-lg
       '
-    onSubmit={handleSubmit(onValid)}
+      onSubmit={handleSubmit(onValid)}
     >
       <Input
         label='Usuario'
-        { ...register('username', {
+        {...register('username', {
           required: 'Usuario es obligatorio',
-        }) }
+        })}
         error={errors.username?.message}
       />
       <Input
         label='Email'
-        { ...register('email', {
+        {...register('email', {
           required: 'Email es obligatorio',
           pattern: {
             value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
             message: 'Formato de email incorrecto',
           },
-        }) }
+        })}
         error={errors.email?.message}
       />
-      <Select
-        label='Role'
-        options={[ { value: 'CUSTOMER', label: 'Cliente' }, { value: 'ADMIN', label: 'Administrador' }, { value: 'SELLER', label: 'Vendedor' } ]}
-        { ...register('role', { required: 'Seleccione un rol' }) }
-        error={errors.role?.message}
-      />
+      {location.pathname === '/signup' && (
+        <Select
+          label='Role'
+          options={[
+            { value: 'customer', label: 'Cliente' },
+            { value: 'admin', label: 'Administrador' },
+            { value: 'seller', label: 'Vendedor' },
+          ]}
+          {...register('role', { required: 'Seleccione un rol' })}
+          error={errors.role?.message}
+        />
+      )}
       <Input
         label='Contraseña'
-        { ...register('password', {
+        {...register('password', {
           required: 'Contraseña es obligatorio',
           minLength: {
             value: 8,
             message: 'La contraseña debe tener al menos 8 caracteres',
           },
-        }) }
+        })}
         type='password'
         error={errors.password?.message}
       />
       <Input
         label='Confirmar contraseña'
         type='password'
-        { ...register('confirmPassword', {
+        {...register('confirmPassword', {
           required: 'Debe confirmar la contraseña',
           validate: (value) =>
             value === watch('password') || 'Las contraseñas deben coincidir',
-        }) }
+        })}
         error={errors.confirmPassword?.message}
       />
       {errorMessage && <p className='text-red-500'>{errorMessage}</p>}
 
-      <Button type='submit'>Registrar Usuario</Button>
-      <Button variant='secondary' onClick={() => navigate('/login')}>Inicio de Sesión</Button>
+      <Button type='submit' disabled={isLoading}>
+        {isLoading ? 'Procesando...' : 'Registrar Usuario'}
+      </Button>
+      {!insideModal && (
+        <Button variant='secondary' onClick={() => navigate('/login')}>
+          Inicio de Sesión
+        </Button>
+      )}
     </form>
   );
-};
+}
 
 export default RegisterForm;

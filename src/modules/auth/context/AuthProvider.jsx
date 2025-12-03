@@ -1,13 +1,13 @@
-import { createContext, useState } from "react";
-import { login } from "../services/login";
-import { register } from "../services/register";
-import { jwtDecode } from "jwt-decode";
+import { createContext, useState } from 'react';
+import { login } from '../services/login';
+import { register } from '../services/register';
+import { jwtDecode } from 'jwt-decode';
 
 const AuthContext = createContext();
 
 function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
 
     if (!token) return null;
 
@@ -18,7 +18,6 @@ function AuthProvider({ children }) {
         id: decoded.jti,
         username: decoded.sub,
         role: decoded.role,
-       
       };
     } catch {
       return null;
@@ -26,23 +25,31 @@ function AuthProvider({ children }) {
   });
 
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return Boolean(localStorage.getItem("token"));
+    return Boolean(localStorage.getItem('token'));
   });
 
   const signup = async (formData) => {
     const { confirmPassword: _confirmPassword, ...dataToSubmit } = formData;
 
     const { data, error } = await register(dataToSubmit);
+
     if (error) return { error };
 
-    localStorage.setItem("token", data.token);
+    const { data: loginData, error: loginError } = await login(
+      formData.username,
+      formData.password,
+    );
 
-    const decoded = jwtDecode(data.token);
+    if (loginError) return { error: loginError };
+
+    localStorage.setItem('token', loginData.token);
+
+    const decoded = jwtDecode(loginData.token);
 
     const newUser = {
-       id: decoded.jti,
-        username: decoded.sub,
-        role: decoded.role,
+      id: decoded.jti,
+      username: decoded.sub,
+      role: decoded.role,
     };
 
     setUser(newUser);
@@ -59,16 +66,17 @@ function AuthProvider({ children }) {
 
   const singin = async (username, password) => {
     const { data, error } = await login(username, password);
+
     if (error) return { error };
 
-    localStorage.setItem("token", data.token);
+    localStorage.setItem('token', data.token);
 
     const decoded = jwtDecode(data.token);
 
     const newUser = {
-       id: decoded.jti,
-        username: decoded.sub,
-        role: decoded.role,
+      id: decoded.jti,
+      username: decoded.sub,
+      role: decoded.role,
     };
 
     setUser(newUser);

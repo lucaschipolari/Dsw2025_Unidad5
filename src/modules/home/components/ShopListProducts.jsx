@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { getPublicProducts } from "../../products/services/list";
-import Button from "../../shared/components/Button";
-import CardProduct from "./CardProduct";
+import React, { useEffect, useState } from 'react';
+import { getPublicProducts } from '../../products/services/list';
+import Button from '../../shared/components/Button';
+import CardProduct from './CardProduct';
 
 const ShopListProducts = () => {
   const [products, setProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [status, setStatus] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -20,7 +20,7 @@ const ShopListProducts = () => {
         searchTerm,
         status,
         pageNumber,
-        pageSize
+        pageSize,
       );
 
       setProducts(data.productItems);

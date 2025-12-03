@@ -1,28 +1,40 @@
-import { useState } from "react";
-import { Menu, X, Search } from "lucide-react";
+import { useState } from 'react';
+import { Menu, X, Search } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
+import useAuth from '../../auth/hook/useAuth';
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const { isAuthenticated, user, singout } = useAuth();
 
   return (
     <nav className="w-full bg-white shadow-sm px-4 py-3">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        {/* LOGO */}
         <div className="flex items-center gap-2">
           <img src="/vite.svg" alt="logo" className="w-8 h-8" />
         </div>
-
-        {/* MENÚ DESKTOP */}
         <div className="hidden md:flex items-center gap-6 text-sm">
-          <a href="#" className="px-3 py-1 rounded-md bg-gray-100">
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              `px-3 py-1 rounded-md ${
+                isActive ? 'bg-gray-200 text-gray-900' : 'hover:bg-gray-100'
+              }`
+            }
+          >
             Productos
-          </a>
-          <a href="#" className="hover:text-gray-600">
+          </NavLink>
+          <NavLink
+            to="/cart"
+            className={({ isActive }) =>
+              `px-3 py-1 rounded-md ${
+                isActive ? 'bg-gray-200 text-gray-900' : 'hover:bg-gray-100'
+              }`
+            }
+          >
             Carrito de compras
-          </a>
+          </NavLink>
         </div>
-
-        {/* SEARCH DESKTOP */}
         <div className="hidden md:flex w-72 items-center bg-gray-100 rounded-full px-4 py-2">
           <input
             type="text"
@@ -31,34 +43,73 @@ export default function Navbar() {
           />
           <Search size={18} />
         </div>
-
-        {/* BOTONES DESKTOP */}
         <div className="hidden md:flex items-center gap-3">
-          <button className="px-4 py-2 rounded-md bg-purple-200 text-sm">
-            Iniciar Sesión
-          </button>
-          <button className="px-4 py-2 rounded-md bg-gray-200 text-sm">
-            Registrarse
-          </button>
+          {isAuthenticated ? (
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">¡Hola, {user?.username}!</span>
+              <button
+                onClick={singout}
+                className="px-3 py-1 rounded-md bg-red-200 text-sm hover:bg-red-300"
+              >
+                Cerrar sesión
+              </button>
+            </div>
+          ) : (
+            <>
+              <NavLink
+                to="/login"
+                className={({ isActive }) =>
+                  `px-4 py-2 rounded-md text-sm ${
+                    isActive ? 'bg-purple-300' : 'bg-purple-200 hover:bg-purple-300'
+                  }`
+                }
+              >
+                Iniciar Sesión
+              </NavLink>
+              <NavLink
+                to="/signup"
+                className={({ isActive }) =>
+                  `px-4 py-2 rounded-md text-sm ${
+                    isActive ? 'bg-gray-300' : 'bg-gray-200 hover:bg-gray-300'
+                  }`
+                }
+              >
+                Registrarse
+              </NavLink>
+            </>
+          )}
         </div>
 
-        {/* HAMBURGER BUTTON (MOBILE) */}
+        {/* Mobile menu toggle */}
         <button className="md:hidden" onClick={() => setOpen(!open)}>
           {open ? <X size={28} /> : <Menu size={28} />}
         </button>
       </div>
 
-      {/* MENÚ MOBILE */}
+      {/* Mobile menu */}
       {open && (
         <div className="md:hidden flex flex-col gap-4 mt-4 px-2 pb-4">
-          <a href="#" className="px-3 py-2 rounded-md bg-gray-100">
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              `px-3 py-2 rounded-md ${
+                isActive ? 'bg-gray-200 text-gray-900' : 'hover:bg-gray-100'
+              }`
+            }
+          >
             Productos
-          </a>
-          <a href="#" className="px-3 py-2 hover:bg-gray-50 rounded-md">
+          </NavLink>
+          <NavLink
+            to="/cart"
+            className={({ isActive }) =>
+              `px-3 py-2 rounded-md ${
+                isActive ? 'bg-gray-200 text-gray-900' : 'hover:bg-gray-100'
+              }`
+            }
+          >
             Carrito de compras
-          </a>
+          </NavLink>
 
-          {/* BUSCADOR */}
           <div className="flex w-full items-center bg-gray-100 rounded-full px-4 py-2">
             <input
               type="text"
@@ -68,13 +119,40 @@ export default function Navbar() {
             <Search size={18} />
           </div>
 
-          {/* BOTONES */}
-          <button className="px-4 py-2 rounded-md bg-purple-200 text-sm">
-            Iniciar Sesión
-          </button>
-          <button className="px-4 py-2 rounded-md bg-gray-200 text-sm">
-            Registrarse
-          </button>
+          {isAuthenticated ? (
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">{user?.name}</span>
+              <button
+                onClick={singout}
+                className="px-3 py-1 rounded-md bg-red-200 text-sm hover:bg-red-300"
+              >
+                Cerrar sesión
+              </button>
+            </div>
+          ) : (
+            <>
+              <NavLink
+                to="/login"
+                className={({ isActive }) =>
+                  `px-4 py-2 rounded-md text-sm ${
+                    isActive ? 'bg-purple-300' : 'bg-purple-200 hover:bg-purple-300'
+                  }`
+                }
+              >
+                Iniciar Sesión
+              </NavLink>
+              <NavLink
+                to="/signup"
+                className={({ isActive }) =>
+                  `px-4 py-2 rounded-md text-sm ${
+                    isActive ? 'bg-gray-300' : 'bg-gray-200 hover:bg-gray-300'
+                  }`
+                }
+              >
+                Registrarse
+              </NavLink>
+            </>
+          )}
         </div>
       )}
     </nav>

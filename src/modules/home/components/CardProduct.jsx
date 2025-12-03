@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { Minus, Plus } from "lucide-react";
-import Button from "../../shared/components/Button";
-import { useCartStore } from "../../../stores/useCartStore";
+import React, { useState, useEffect } from 'react';
+import { Minus, Plus } from 'lucide-react';
+import Button from '../../shared/components/Button';
+import { useCartStore } from '../../../stores/useCartStore';
 
 const CardProduct = ({ product }) => {
   const { addProduct, products, updateQuantity } = useCartStore();
@@ -74,11 +74,14 @@ const CardProduct = ({ product }) => {
               value={quantity}
               onChange={(e) => {
                 const q = Number(e.target.value);
+
                 if (q > 0) {
                   if (cartProduct) {
                     const diff = q - cartProduct.quantity;
+
                     updateQuantity(product.id, diff);
                   }
+
                   setQuantity(q);
                 }
               }}

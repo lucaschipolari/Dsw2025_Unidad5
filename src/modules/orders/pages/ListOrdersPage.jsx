@@ -1,23 +1,23 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Card from "../../shared/components/Card";
-import Button from "../../shared/components/Button";
-import { getProducts } from "../../products/services/list";
-import { getOrders } from "../services/listServices";
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Card from '../../shared/components/Card';
+import Button from '../../shared/components/Button';
+import { getProducts } from '../../products/services/list';
+import { getOrders } from '../services/listServices';
 
 const orderStatus = {
-  ALL: "all",
-  PENDING: "pending",
-  PROCESSING: "inprocess",
-  SHIPPED: "shipped",
-  DELIVERED: "delivered",
-  CANCELED: "cancelled",
+  ALL: 'all',
+  PENDING: 'pending',
+  PROCESSING: 'inprocess',
+  SHIPPED: 'shipped',
+  DELIVERED: 'delivered',
+  CANCELED: 'cancelled',
 };
 
 function ListOrderPage() {
   const navigate = useNavigate();
 
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [status, setStatus] = useState(orderStatus.ALL);
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -34,7 +34,7 @@ function ListOrderPage() {
         searchTerm,
         status,
         pageNumber,
-        pageSize
+        pageSize,
       );
 
       if (error) throw error;
@@ -87,14 +87,14 @@ function ListOrderPage() {
                   strokeLinejoin="round"
                 ></g>
                 <g id="SVGRepo_iconCarrier">
-                  {" "}
+                  {' '}
                   <path
                     d="M15.7955 15.8111L21 21M18 10.5C18 14.6421 14.6421 18 10.5 18C6.35786 18 3 14.6421 3 10.5C3 6.35786 6.35786 3 10.5 3C14.6421 3 18 6.35786 18 10.5Z"
                     stroke="#000000"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                  ></path>{" "}
+                  ></path>{' '}
                 </g>
               </svg>
             </Button>
@@ -127,17 +127,17 @@ function ListOrderPage() {
                 <div className="p-2 w-2xl">
                   <span
                     className={`px-3 py-1 my-2.5 rounded text-white ${
-                      order.orderStatus === "PENDING"
-                        ? "bg-yellow-500"
-                        : order.orderStatus === "PROCESSING"
-                        ? "bg-blue-500"
-                        : order.orderStatus === "CANCELED"
-                        ? "bg-red-600"
-                        : order.orderStatus === "DELIVERED"
-                        ? "bg-green-600"
-                        : order.orderStatus === "SHIPPED"
-                        ? "bg-purple-600"
-                        : "bg-gray-500"
+                      order.orderStatus === 'PENDING'
+                        ? 'bg-yellow-500'
+                        : order.orderStatus === 'PROCESSING'
+                          ? 'bg-blue-500'
+                          : order.orderStatus === 'CANCELED'
+                            ? 'bg-red-600'
+                            : order.orderStatus === 'DELIVERED'
+                              ? 'bg-green-600'
+                              : order.orderStatus === 'SHIPPED'
+                                ? 'bg-purple-600'
+                                : 'bg-gray-500'
                     }`}
                   >
                     {order.orderStatus}

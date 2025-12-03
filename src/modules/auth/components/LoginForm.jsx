@@ -6,7 +6,7 @@ import Button from '../../shared/components/Button';
 import useAuth from '../hook/useAuth';
 import { frontendErrorMessage } from '../helpers/backendError';
 
-function LoginForm() {
+function LoginForm({ insideModal = false }) {
   const [errorMessage, setErrorMessage] = useState('');
   const {
     register,
@@ -70,7 +70,9 @@ function LoginForm() {
       />
 
       <Button type='submit'>Iniciar Sesión</Button>
-      <Button variant='secondary' onClick={() => navigate('/signup')}>Registrar Usuario</Button>
+      {!insideModal && (
+        <Button variant='secondary' onClick={() => navigate('/signup')}>Registrar Usuario</Button>
+      )}
       {errorMessage && <p className='text-red-500'>{errorMessage}</p>}
     </form>
   );

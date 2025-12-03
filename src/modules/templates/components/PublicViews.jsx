@@ -1,6 +1,6 @@
-import React from "react";
-import Navbar from "../../shared/components/Navbar";
-import { Outlet } from "react-router-dom";
+import React from 'react';
+import Navbar from '../../shared/components/Navbar';
+import { Outlet } from 'react-router-dom';
 
 const PublicViews = () => {
   return (

@@ -1,6 +1,6 @@
-import Swal from "sweetalert2";
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import Swal from 'sweetalert2';
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 export const useCartStore = create(
   persist(
@@ -9,16 +9,19 @@ export const useCartStore = create(
       addProduct: (product) =>
         set((state) => {
           const existingProductIndex = state.products.findIndex(
-            (p) => p.id === product.id
+            (p) => p.id === product.id,
           );
+
           if (existingProductIndex >= 0) {
             const updateProducts = [...state.products];
+
             updateProducts[existingProductIndex] = {
               ...updateProducts[existingProductIndex],
               quantity:
                 updateProducts[existingProductIndex].quantity +
                 product.quantity,
             };
+
             return { products: updateProducts };
           } else {
             return {
@@ -37,21 +40,21 @@ export const useCartStore = create(
               if (product.id === id) {
                 if (product.quantity === 1 && increment === -1) {
                   Swal.fire({
-                    title: "¿Estás seguro?",
-                    text: "Estás a punto de eliminar el producto del carrito.",
-                    icon: "warning",
+                    title: '¿Estás seguro?',
+                    text: 'Estás a punto de eliminar el producto del carrito.',
+                    icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonText: "Sí, eliminar",
-                    cancelButtonText: "Cancelar",
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar',
                   }).then((result) => {
                     if (result.isConfirmed) {
                       set((state) => ({
                         products: state.products.filter((p) => p.id !== id),
                       }));
                       Swal.fire(
-                        "Eliminado",
-                        "El producto ha sido eliminado.",
-                        "success"
+                        'Eliminado',
+                        'El producto ha sido eliminado.',
+                        'success',
                       );
                     }
                   });
@@ -62,30 +65,57 @@ export const useCartStore = create(
                   };
                 }
               }
+
               return product;
             }),
           };
         }),
 
-      clearCart: () =>
-        set((state) => ({
-          products: state.products.map((product) => ({
-            ...product,
-            quantity: 0,
-          })),
-        })),
+      clearCart: () => set(() => ({
+        products: [],
+      })),
+      clearProduct: (id) =>
+        set((state) => {
+          return {
+            products: state.products.map((product) => {
+              if (product.id === id) {
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: 'Estás a punto de eliminar el producto del carrito.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar',
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    set((state) => ({
+                      products: state.products.filter((p) => p.id !== id),
+                    }));
+                    Swal.fire(
+                      'Eliminado',
+                      'El producto ha sido eliminado.',
+                      'success',
+                    );
+                  }
+                });
+              }
+
+              return product;
+            }),
+          };
+        }),
     }),
     {
-      name: "cart-storage",
+      name: 'cart-storage',
       getStorage: () => localStorage,
-    }
-  )
+    },
+  ),
 );
 
 export const useTotalPrice = () =>
   useCartStore((state) =>
     state.products.reduce(
       (acc, product) => acc + product.price * product.quantity,
-      0
-    )
+      0,
+    ),
   );

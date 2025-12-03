@@ -1,23 +1,21 @@
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
-import { AuthProvider } from "./modules/auth/context/AuthProvider";
-import PrincipalPage from "./modules/home/pages/PrincipalPage";
-import LoginPage from "./modules/auth/pages/LoginPage";
-import RegisterPage from "./modules/auth/pages/RegisterPage";
-import Dashboard from "./modules/templates/components/Dashboard";
-import ProtectedRoute from "./modules/auth/components/ProtectedRoute";
-import ListOrdersPage from "./modules/orders/pages/ListOrdersPage";
-import Home from "./modules/home/pages/Home";
-import ListProductsPage from "./modules/products/pages/ListProductsPage";
-import CreateProductPage from "./modules/products/pages/CreateProductPage";
-import PublicViews from "./modules/templates/components/PublicViews";
-import CartPage from "./modules/cart/pages/CartPage";
-
-
+import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
+import { AuthProvider } from './modules/auth/context/AuthProvider';
+import PrincipalPage from './modules/home/pages/PrincipalPage';
+import LoginPage from './modules/auth/pages/LoginPage';
+import RegisterPage from './modules/auth/pages/RegisterPage';
+import Dashboard from './modules/templates/components/Dashboard';
+import ProtectedRoute from './modules/auth/components/ProtectedRoute';
+import ListOrdersPage from './modules/orders/pages/ListOrdersPage';
+import Home from './modules/home/pages/Home';
+import ListProductsPage from './modules/products/pages/ListProductsPage';
+import CreateProductPage from './modules/products/pages/CreateProductPage';
+import PublicViews from './modules/templates/components/PublicViews';
+import CartPage from './modules/cart/pages/CartPage';
 
 function App() {
   const router = createBrowserRouter([
     {
-      path: "/",
+      path: '/',
       element: (
         <>
           <PublicViews />
@@ -25,25 +23,25 @@ function App() {
       ),
       children: [
         {
-          path: "/",
+          path: '/',
           element: <PrincipalPage />,
         },
         {
-          path: "/cart",
+          path: '/cart',
           element: <CartPage/>,
         },
       ],
     },
     {
-      path: "/login",
+      path: '/login',
       element: <LoginPage />,
     },
     {
-      path: "/signup",
+      path: '/signup',
       element: <RegisterPage />,
     },
     {
-      path: "/admin",
+      path: '/admin',
       element: (
         <ProtectedRoute>
           <Dashboard />
@@ -51,19 +49,19 @@ function App() {
       ),
       children: [
         {
-          path: "/admin/home",
+          path: '/admin/home',
           element: <Home />,
         },
         {
-          path: "/admin/products",
+          path: '/admin/products',
           element: <ListProductsPage />,
         },
         {
-          path: "/admin/products/create",
+          path: '/admin/products/create',
           element: <CreateProductPage />,
         },
         {
-          path: "/admin/orders",
+          path: '/admin/orders',
           element: <ListOrdersPage />,
         },
       ],

@@ -1,81 +1,103 @@
-import React from "react";
-import { Minus, Plus } from "lucide-react";
-import Button from "../../shared/components/Button";
-
-import { useCartStore, useTotalPrice } from "../../../stores/useCartStore";
-import useAuth from "../../auth/hook/useAuth";
-import Swal from "sweetalert2";
-import { postOrders } from "../services/cartOrdes";
+import { Minus, Plus } from 'lucide-react';
+import Button from '../../shared/components/Button';
+import { useState } from 'react';
+import { useCartStore, useTotalPrice } from '../../../stores/useCartStore';
+import useAuth from '../../auth/hook/useAuth';
+import Swal from 'sweetalert2';
+import { postOrders } from '../services/cartOrders';
+import ModalLogin from '../../auth/components/ModalLogin';
+import ModalRegister from '../../auth/components/ModalRegister';
 
 const Cart = () => {
-  const { products, updateQuantity, clearCart } = useCartStore();
+  const { products, updateQuantity, clearCart, clearProduct } = useCartStore();
   const totalPrice = useTotalPrice();
   const { isAuthenticated, user } = useAuth();
+  // const [ showModal, setShowModal ] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
 
   const totalItems = products.reduce((acc, p) => acc + p.quantity, 0);
 
- const handleBuy = async () => {
-  if (!isAuthenticated) {
+  const handleLimpiarCarrito = () =>{
     Swal.fire({
-      icon: "warning",
-      title: "Debes iniciar sesión",
-      text: "Inicia sesión para continuar con la compra.",
+      title: '¿Estás seguro?',
+      text: 'Se eliminarán todos los productos del carrito.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, limpiar',
+      cancelButtonText: 'Cancelar',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        clearCart();
+
+        Swal.fire({
+          title: 'Carrito limpio',
+          text: 'El carrito ha sido eliminado correctamente.',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      }
     });
-    return;
-  } console.log (user)
-
-  if (products.length === 0) {
-    Swal.fire({
-      icon: "info",
-      title: "Tu carrito está vacío",
-    });
-    return;
-  }
-
-  // Construcción de orderItems
-  const orderItems = products.map((item) => ({
-    quantity: item.quantity,
-    productId: item.id,
-    name: item.name,
-    description: item.description ?? "",
-    unitPrice: item.price,
-  }));
-
-  // Payload final
-  const payload = {
-    customerId: user.id ?? user.userId ?? user.sub, // soporte a distintos formatos
-    shippingAddress: user.shippingAddress ?? "",
-    billingAddress: user.billingAddress ?? "",
-    orderItems,
   };
+  const handleBuy = async () => {
+    if (!isAuthenticated) {
+      setShowLogin(true);
 
-  try { const response = await postOrders (payload);
-
-    if (!response.ok) {
-      throw new Error("Error en la creación del pedido");
+      return;
     }
 
-    Swal.fire({
-      icon: "success",
-      title: "Pedido creado",
-      text: "Tu compra ha sido procesada correctamente.",
-    });
+    if (products.length === 0) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Tu carrito está vacío',
+      });
 
-    clearCart();
-  } catch (error) {
-    Swal.fire({
-      icon: "error",
-      title: "Error al procesar el pedido",
-      text: error.message,
-    });
-  }
-};
+      return;
+    }
+
+    const orderItems = products.map((item) => ({
+      quantity: item.quantity,
+      productId: item.id,
+      name: item.name,
+      description: item.description ?? '',
+      unitPrice: item.price,
+    }));
+
+    const payload = {
+      customerId: user.id ?? user.userId ?? user.sub, // soporte a distintos formatos
+      shippingAddress: user.shippingAddress ?? 'shipping',
+      billingAddress: user.billingAddress ?? 'billing',
+      orderItems,
+    };
+
+    console.log(payload);
+
+    try { const response = await postOrders (payload);
+
+      if (!response.ok) {
+        throw new Error('Error en la creación del pedido');
+      }
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Pedido creado',
+        text: 'Tu compra ha sido procesada correctamente.',
+      });
+      localStorage.removeItem('cart-storage');
+      clearCart();
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al procesar el pedido',
+        text: error.message,
+      });
+    }
+  };
 
   return (
     <div className="mx-10 my-10">
       <div className="flex flex-col lg:flex-row gap-8">
-
-        {/* IZQUIERDA: Productos del carrito */}
         <div className="flex-1 space-y-6">
 
           {products.length === 0 && (
@@ -98,32 +120,23 @@ const Cart = () => {
                   <span>Sub Total: ${item.price * item.quantity}</span>
                 </div>
               </div>
-
-              {/* Controles */}
               <div className="flex items-center gap-3">
-
-                {/* Decrementar */}
                 <button
                   className="h-8 w-8 rounded-full border flex items-center justify-center"
                   onClick={() => updateQuantity(item.id, -1)}
                 >
                   <Minus size={16} />
                 </button>
-
                 <span className="w-6 text-center">{item.quantity}</span>
-
-                {/* Incrementar */}
                 <button
                   className="h-8 w-8 rounded-full border flex items-center justify-center"
                   onClick={() => updateQuantity(item.id, +1)}
                 >
                   <Plus size={16} />
                 </button>
-
-                {/* Borrar */}
                 <button
                   className="ml-4 px-4 py-2 rounded-lg bg-purple-200 text-sm"
-                  onClick={() => updateQuantity(item.id, -item.quantity)}
+                  onClick={() => clearProduct(item.id)}
                 >
                   Borrar
                 </button>
@@ -131,8 +144,6 @@ const Cart = () => {
             </div>
           ))}
         </div>
-
-        {/* DERECHA: Detalle de pedido */}
         <div className="w-full lg:w-80 bg-white border rounded-xl shadow-sm px-6 py-6 flex flex-col justify-between">
           <div>
             <h2 className="text-xl font-semibold">Detalle de pedido</h2>
@@ -156,13 +167,29 @@ const Cart = () => {
 
           <Button
             className="mt-4 w-full py-2 bg-red-300"
-            onClick={clearCart}
+            onClick={handleLimpiarCarrito}
           >
             Vaciar Carrito
           </Button>
         </div>
-
       </div>
+      <ModalLogin
+        show={showLogin}
+        onClose={() => setShowLogin(false)}
+        onSwitch={() => {
+          setShowLogin(false);
+          setShowRegister(true);
+        }}
+      />
+
+      <ModalRegister
+        show={showRegister}
+        onClose={() => setShowRegister(false)}
+        onSwitch={() => {
+          setShowRegister(false);
+          setShowLogin(true);
+        }}
+      />
     </div>
   );
 };
