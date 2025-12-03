@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { Minus, Plus, ShoppingCart } from "lucide-react";
-import Button from "../../shared/components/Button";
-import { useCartStore } from "../../../stores/useCartStore";
-import Swal from "sweetalert2";
+import React, { useState } from 'react';
+import { Minus, Plus, ShoppingCart } from 'lucide-react';
+import Button from '../../shared/components/Button';
+import { useCartStore } from '../../../stores/useCartStore';
+import Swal from 'sweetalert2';
 
 const CardProduct = ({ product }) => {
   const { addProduct, products } = useCartStore();
@@ -27,8 +27,8 @@ const CardProduct = ({ product }) => {
 
     if (currentInCart + quantity > product.stockQuantity) {
       Swal.fire({
-        icon: "info",
-        title: "No hay suficiente stock para agregar más al carrito",
+        icon: 'info',
+        title: 'No hay suficiente stock para agregar más al carrito',
         text: `Solo hay ${
           product.stockQuantity - currentInCart
         } unidad(es) disponibles.`,
@@ -45,10 +45,10 @@ const CardProduct = ({ product }) => {
     });
 
     Swal.fire({
-      icon: "success",
-      title: "Producto agregado",
+      icon: 'success',
+      title: 'Producto agregado',
       text: `Se agregaron ${quantity} unidad(es) de "${product.name}" al carrito.`,
-      confirmButtonText: "OK",
+      confirmButtonText: 'OK',
     });
 
     setQuantity(1);
@@ -106,8 +106,8 @@ const CardProduct = ({ product }) => {
               <Plus
                 className={
                   quantity < product.stockQuantity
-                    ? "cursor-pointer text-blue-500 hover:text-blue-700"
-                    : "text-gray-400 cursor-not-allowed"
+                    ? 'cursor-pointer text-blue-500 hover:text-blue-700'
+                    : 'text-gray-400 cursor-not-allowed'
                 }
                 onClick={
                   quantity < product.stockQuantity ? handleIncrement : undefined

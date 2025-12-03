@@ -29,33 +29,71 @@ function AuthProvider({ children }) {
   });
 
   const signup = async (formData) => {
-    const { confirmPassword: _confirmPassword, ...dataToSubmit } = formData;
+    try {
+      // 1. Filtrar confirmPassword
+      const { confirmPassword: _confirmPassword, ...dataToSubmit } = formData;
 
-    const { error } = await register(dataToSubmit);
+      // 2. Registrar usuario
+      const registerResponse = await register(dataToSubmit);
 
-    if (error) return { error };
+      if (!registerResponse.success) {
+        return {
+          success: false,
+          status: registerResponse.status,
+          message: registerResponse.message,
+          errorCode: registerResponse.errorCode,
+          data: null,
+        };
+      }
 
-    const { data: loginData, error: loginError } = await login(
-      formData.username,
-      formData.password,
-    );
+      // 3. Login automático
+      const loginResponse = await login(formData.username, formData.password);
 
-    if (loginError) return { error: loginError };
+      if (!loginResponse.success) {
+        return {
+          success: false,
+          status: loginResponse.status,
+          message: loginResponse.message,
+          errorCode: loginResponse.errorCode,
+          data: null,
+        };
+      }
 
-    localStorage.setItem('token', loginData.token);
+      // 4. Guardar token y decodificar
+      localStorage.setItem('token', loginResponse.data.token);
 
-    const decoded = jwtDecode(loginData.token);
+      const decoded = jwtDecode(loginResponse.data.token);
 
-    const newUser = {
-      id: decoded.jti,
-      username: decoded.sub,
-      role: decoded.role,
-    };
+      const newUser = {
+        id: decoded.jti,
+        username: decoded.sub,
+        role: decoded.role,
+        customerId: loginResponse.data.profile?.customerId,
+        customerName: loginResponse.data.profile?.customerName,
+        email: loginResponse.data.email,
+      };
 
-    setUser(newUser);
-    setIsAuthenticated(true);
+      setUser(newUser);
+      setIsAuthenticated(true);
 
-    return { error: null };
+      return {
+        success: true,
+        status: 200,
+        message: 'Registro e inicio de sesión exitoso',
+        errorCode: null,
+        data: newUser,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: error.response?.status || 500,
+        message:
+          error.response?.data?.message ||
+          'Error de red. Servidor no responde.',
+        errorCode: error.response?.data?.errorCode || null,
+        data: null,
+      };
+    }
   };
 
   const singout = () => {
@@ -65,27 +103,56 @@ function AuthProvider({ children }) {
   };
 
   const singin = async (username, password) => {
-    const { data, error } = await login(username, password);
+    try {
+      const response = await login(username, password);
 
-    if (error) return { error };
+      // Si el backend indica error
+      if (!response.success) {
+        return {
+          success: false,
+          status: response.status,
+          message: response.message,
+          errorCode: response.errorCode,
+          data: null,
+        };
+      }
 
-    localStorage.setItem('token', data.token);
+      // Guardar token
+      localStorage.setItem('token', response.data.token);
 
-    const decoded = jwtDecode(data.token);
+      // Decodificar token
+      const decoded = jwtDecode(response.data.token);
 
-    const newUser = {
-      id: decoded.jti,
-      username: decoded.sub,
-      role: decoded.role,
-      customerId: data.profile?.customerId,
-      customerName: data.profile?.customerName,
-      email: data.email,
-    };
+      const newUser = {
+        id: decoded.jti,
+        username: decoded.sub,
+        role: decoded.role,
+        customerId: response.data.profile?.customerId,
+        customerName: response.data.profile?.customerName,
+        email: response.data.email,
+      };
 
-    setUser(newUser);
-    setIsAuthenticated(true);
+      setUser(newUser);
+      setIsAuthenticated(true);
 
-    return { error: null };
+      return {
+        success: true,
+        status: 200,
+        message: 'Inicio de sesión exitoso',
+        errorCode: null,
+        data: newUser,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: error.response?.status || 500,
+        message:
+          error.response?.data?.message ||
+          'Error de red. Servidor no responde.',
+        errorCode: error.response?.data?.errorCode || null,
+        data: null,
+      };
+    }
   };
 
   return (
